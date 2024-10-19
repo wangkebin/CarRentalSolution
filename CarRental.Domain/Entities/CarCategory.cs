@@ -4,15 +4,15 @@ namespace CarRental.Domain.Entities;
 
 public enum CarCategory
 {
-    [Description("Undefined")]
+    //[Description("Undefined")]
     Undefined = 0,
      
-    [Description("Sedan")]
+    //[Description("Sedan")]
     Sedan = 1,
 
-    [Description("SUV")]
+    //[Description("SUV")]
     SUV = 2,
 
-    [Description("Van")]
+    //[Description("Van")]
     Van = 3
 }
