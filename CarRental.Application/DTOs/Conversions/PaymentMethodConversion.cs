@@ -26,7 +26,7 @@ public static class PaymentMethodConversion
             paymentMethod!.CustomerId);
     }
 
-    public static IEnumerable<PaymentMethodDTO>? FromPaymentMethods(this IEnumerable<PaymentMethod>? paymentMethods)
+    public static IEnumerable<PaymentMethodDTO>? FromPaymentMethod(this IEnumerable<PaymentMethod>? paymentMethods)
     {
         if (paymentMethods == null) return null;
         return paymentMethods.Select(p => p.FromPaymentMethod()!).ToList();

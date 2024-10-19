@@ -22,14 +22,13 @@ public class CustomerRepository(CustomerDbContext context) : ICustomer
             var currentCustomer = context.Customers.Add(entity).Entity;
             await context.SaveChangesAsync();
 
-            if (currentCustomer.Id > 0)
-            {
-                return new Response(true, $"Customer with id: {currentCustomer.Id} has been created");
-            }
-            else
+            if (currentCustomer.Id <= 0)
             {
                 return new Response(false, $"Customer with email: {entity.Email} failed to create");
             }
+
+            return new Response(true, $"Customer with id: {currentCustomer.Id} has been created");
+
         }
         catch (Exception ex)
         {
@@ -51,14 +50,12 @@ public class CustomerRepository(CustomerDbContext context) : ICustomer
             _ = context.Customers.Update(entity).Entity;
             var updatedRows = await context.SaveChangesAsync();
 
-            if (updatedRows > 0)
-            {
-                return new Response(true, $"Customer with id: {entity.Id} has been updated");
-            }
-            else
+            if (updatedRows <= 0)
             {
                 return new Response(false, $"Failed to update customer with id: {entity.Id}");
             }
+            return new Response(true, $"Customer with id: {entity.Id} has been updated");
+
         }
         catch (Exception ex)
         {
@@ -79,14 +76,12 @@ public class CustomerRepository(CustomerDbContext context) : ICustomer
             }
             _ = context.Customers.Remove(existingCustomer).Entity;
             var deletedRows = await context.SaveChangesAsync();
-            if (deletedRows > 0)
-            {
-                return new Response(true, $"Customer with id: {id} has been deleted");
-            }
-            else
+            if (deletedRows <= 0)
             {
                 return new Response(false, $"Failed to delete customer with id: {id}");
             }
+
+            return new Response(true, $"Customer with id: {id} has been deleted");
         }
         catch (Exception ex)
         {

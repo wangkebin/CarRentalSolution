@@ -17,14 +17,13 @@ public class ReservationRepository(ReservationDbContext context) : IReservation
             var currentReservation = context.Reservations.Add(entity).Entity;
             await context.SaveChangesAsync();
 
-            if (currentReservation.Id != Guid.Empty)
-            {
-                return new Response(true, $"Reservation with id: {currentReservation.Id} has been created");
-            }
-            else
+            if (currentReservation.Id == Guid.Empty)
             {
                 return new Response(false, $"Reservation for car: {entity.CarId} failed to create");
             }
+
+            return new Response(true, $"Reservation with id: {currentReservation.Id} has been created");
+
         }
         catch (Exception ex)
         {
@@ -46,14 +45,13 @@ public class ReservationRepository(ReservationDbContext context) : IReservation
             _ = context.Reservations.Update(entity).Entity;
             var updatedRows = await context.SaveChangesAsync();
 
-            if (updatedRows > 0)
-            {
-                return new Response(true, $"Reservation with id: {entity.Id} has been updated");
-            }
-            else
+            if (updatedRows <= 0)
             {
                 return new Response(false, $"Failed to update reservation with id: {entity.Id}");
             }
+
+            return new Response(true, $"Reservation with id: {entity.Id} has been updated");
+
         }
         catch (Exception ex)
         {
@@ -73,14 +71,13 @@ public class ReservationRepository(ReservationDbContext context) : IReservation
             }
             _ = context.Reservations.Remove(existingReservation).Entity;
             var deletedRows = await context.SaveChangesAsync();
-            if (deletedRows > 0)
-            {
-                return new Response(true, $"Reservation with id: {id} has been deleted");
-            }
-            else
+            if (deletedRows <= 0)
             {
                 return new Response(false, $"Failed to delete reservation with id: {id}");
             }
+
+            return new Response(true, $"Reservation with id: {id} has been deleted");
+
         }
         catch (Exception ex)
         {

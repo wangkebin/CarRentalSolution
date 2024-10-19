@@ -13,6 +13,6 @@ public class PaymentMethodService(IPaymentMethod paymentMethodInterface, HttpCli
     {
         var paymentMethods = await paymentMethodInterface.GetByAsync(p=>p.CustomerId == customerId);
         if (!paymentMethods.Any()) return null!;
-        return PaymentMethodConversion.FromPaymentMethods(paymentMethods)!;
+        return PaymentMethodConversion.FromPaymentMethod(paymentMethods)!;
     }
 }

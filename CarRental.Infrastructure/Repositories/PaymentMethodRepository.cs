@@ -22,14 +22,13 @@ public class PaymentMethodRepository(PaymentMethodDbContext context) : IPaymentM
             var currentPaymentMethod = context.PaymentMethods.Add(entity).Entity;
             await context.SaveChangesAsync();
 
-            if (currentPaymentMethod.Id > 0)
-            {
-                return new Response(true, $"Payment method with id: {currentPaymentMethod.Id} has been created");
-            }
-            else
+            if (currentPaymentMethod.Id <= 0)
             {
                 return new Response(false, $"Payment method with card number: {entity.CardNumber} failed to create");
             }
+
+            return new Response(true, $"Payment method with id: {currentPaymentMethod.Id} has been created");
+
         }
         catch (Exception ex)
         {
@@ -51,14 +50,12 @@ public class PaymentMethodRepository(PaymentMethodDbContext context) : IPaymentM
             _ = context.PaymentMethods.Update(entity).Entity;
             var updatedRows = await context.SaveChangesAsync();
 
-            if (updatedRows > 0)
-            {
-                return new Response(true, $"Payment method with id: {entity.Id} has been updated");
-            }
-            else
+            if (updatedRows <= 0)
             {
                 return new Response(false, $"Failed to update payment method with id: {entity.Id}");
             }
+            return new Response(true, $"Payment method with id: {entity.Id} has been updated");
+
         }
         catch (Exception ex)
         {
@@ -78,14 +75,13 @@ public class PaymentMethodRepository(PaymentMethodDbContext context) : IPaymentM
             }
             _ = context.PaymentMethods.Remove(existingPaymentMethod).Entity;
             var deletedRows = await context.SaveChangesAsync();
-            if (deletedRows > 0)
-            {
-                return new Response(true, $"Payment method with id: {id} has been deleted");
-            }
-            else
+            if (deletedRows <= 0)
             {
                 return new Response(false, $"Failed to delete payment method with id: {id}");
             }
+
+            return new Response(true, $"Payment method with id: {id} has been deleted");
+
         }
         catch (Exception ex)
         {

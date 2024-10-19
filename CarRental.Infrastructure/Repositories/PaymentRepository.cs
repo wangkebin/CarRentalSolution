@@ -17,14 +17,13 @@ public class PaymentRepository(PaymentDbContext context) : IPayment
             var currentPayment = context.Payments.Add(entity).Entity;
             await context.SaveChangesAsync();
 
-            if (currentPayment.Id != Guid.Empty)
-            {
-                return new Response(true, $"Payment with id: {currentPayment.Id} has been created");
-            }
-            else
+            if (currentPayment.Id == Guid.Empty)
             {
                 return new Response(false, $"Payment for id: {entity.Id} failed to create");
             }
+
+            return new Response(true, $"Payment with id: {currentPayment.Id} has been created");
+
         }
         catch (Exception ex)
         {
@@ -46,14 +45,13 @@ public class PaymentRepository(PaymentDbContext context) : IPayment
             _ = context.Payments.Update(entity).Entity;
             var updatedRows = await context.SaveChangesAsync();
 
-            if (updatedRows > 0)
-            {
-                return new Response(true, $"Payment with id: {entity.Id} has been updated");
-            }
-            else
+            if (updatedRows <= 0)
             {
                 return new Response(false, $"Failed to update payment with id: {entity.Id}");
             }
+
+            return new Response(true, $"Payment with id: {entity.Id} has been updated");
+
         }
         catch (Exception ex)
         {
@@ -73,14 +71,13 @@ public class PaymentRepository(PaymentDbContext context) : IPayment
             }
             _ = context.Payments.Remove(existingPayment).Entity;
             var deletedRows = await context.SaveChangesAsync();
-            if (deletedRows > 0)
-            {
-                return new Response(true, $"Payment with id: {id} has been deleted");
-            }
-            else
+            if (deletedRows <= 0)
             {
                 return new Response(false, $"Failed to delete payment with id: {id}");
             }
+
+            return new Response(true, $"Payment with id: {id} has been deleted");
+
         }
         catch (Exception ex)
         {

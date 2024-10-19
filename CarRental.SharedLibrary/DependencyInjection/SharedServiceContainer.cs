@@ -37,7 +37,7 @@ public static class SharedServiceContainer
                 rollingInterval: RollingInterval.Day)
             .CreateLogger();
 
-        services.AddJWTAuthenticationScheme(config);
+        //services.AddJWTAuthenticationScheme(config);
 
         return services;
     }

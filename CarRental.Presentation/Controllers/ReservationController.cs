@@ -41,7 +41,7 @@ public class ReservationController(IReservation reservationInterface) : Controll
     public async Task<ActionResult<Response>> GetReservationById(Guid id)
     {
         var reservation = await reservationInterface.GetByIdAsync(id);
-        if (reservation is null)
+        if (reservation is null || reservation.Id == Guid.Empty)
         {
             return NotFound($"no reservation found with id: {id}");
         }

@@ -41,7 +41,7 @@ public class CustomerController(ICustomer customerInterface) : Controller
     public async Task<ActionResult<Response>> GetCustomerById(int id)
     {
         var customer = await customerInterface.GetByIdAsync(id);
-        if (customer is null)
+        if (customer is null || customer.Id <= 0)
         {
             return NotFound($"No customer found with id: {id}");
         }

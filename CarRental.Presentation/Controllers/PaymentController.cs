@@ -28,7 +28,7 @@ public class PaymentController(IPayment paymentInterface) : Controller
     public async Task<ActionResult<Response>> GetAllPayments()
     {
         var payments = await paymentInterface.GetAllAsync();
-        if (payments.Any())
+        if (!payments.Any())
         {
             return NotFound("no payments found");
         }
@@ -41,7 +41,7 @@ public class PaymentController(IPayment paymentInterface) : Controller
     public async Task<ActionResult<Response>> GetPaymentById(Guid id)
     {
         var payment = await paymentInterface.GetByIdAsync(id);
-        if (payment is null)
+        if (payment is null || payment.Id == Guid.Empty)
         {
             return NotFound($"no payment found with id: {id}");
         }

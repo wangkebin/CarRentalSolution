@@ -15,20 +15,19 @@ public class CarRepository(CarDbContext context) : ICar
         try
         {
             var getCar = (await GetByAsync(c=>c.LicensePlate == entity.LicensePlate)).FirstOrDefault();
-            if (string.IsNullOrEmpty(getCar!.LicensePlate))
+            if (getCar is not null && entity.LicensePlate == getCar!.LicensePlate)
             {
                 return new Response(false, "License Plate already exists");
             }
             var currentCar = context.Cars.Add(entity).Entity;
             await context.SaveChangesAsync();
 
-            if (currentCar.Id > 0)
-            {
-                return new Response(true, $"Car with id: {currentCar.Id} has been created");
-            }
-            else
+            if (currentCar.Id <= 0 )
+            
             {
                 return new Response(false, $"Car with license plate: {entity.LicensePlate} failed to create");
+            } else {
+                return new Response(true, $"Car with id: {currentCar.Id} has been created");
             }
         }
         catch (Exception ex)
@@ -54,14 +53,12 @@ public class CarRepository(CarDbContext context) : ICar
             // Save changes
             var updatedRows = await context.SaveChangesAsync();
 
-            if (updatedRows > 0)
-            {
-                return new Response(true, $"Car with id: {entity.Id} has been updated");
-            }
-            else
+            if (updatedRows <= 0)
             {
                 return new Response(false, $"Failed to update car with id: {entity.Id}");
             }
+
+            return new Response(true, $"Car with id: {entity.Id} has been updated");
         }
         catch (Exception ex)
         {
@@ -81,14 +78,11 @@ public class CarRepository(CarDbContext context) : ICar
             }
             _= context.Cars.Remove(existingCar).Entity;
             var deletedRows = await context.SaveChangesAsync();
-            if (deletedRows > 0)
-            {
-                return new Response(true, $"Car with id: {id} has been deleted");
-            }
-            else
+            if (deletedRows <= 0)
             {
                 return new Response(false, $"Failed to delete car with id: {id}");
             }
+            return new Response(true, $"Car with id: {id} has been deleted");
         }
         catch (Exception ex)
         {

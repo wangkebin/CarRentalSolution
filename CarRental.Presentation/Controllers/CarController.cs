@@ -28,7 +28,7 @@ public class CarController(ICar carInterface) : Controller
     public async Task<ActionResult<Response>> GetAllCars()
     {
         var cars = await carInterface.GetAllAsync();
-        if (cars.Any())
+        if (!cars.Any())
         {
             return NotFound("no cars found ");
         }
@@ -41,7 +41,7 @@ public class CarController(ICar carInterface) : Controller
     public async Task<ActionResult<Response>> GetCarById(int id)
     {
         var car = await carInterface.GetByIdAsync(id);
-        if (car is null)
+        if (car is null || car.Id <= 0)
         {
             return NotFound($"no car found with id: {id}");
         }
