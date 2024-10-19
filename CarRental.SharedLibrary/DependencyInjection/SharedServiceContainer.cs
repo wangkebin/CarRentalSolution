@@ -14,16 +14,16 @@ public static class SharedServiceContainer
         (this IServiceCollection services, IConfiguration config, string fileName)
         where TContext : DbContext
     {
-        if (config.GetConnectionString("SqlType") == "MySql"){
+        if (config.GetConnectionString("SQLType") == "MySql"){
             services.AddDbContext<TContext>(option => option.UseMySql(  
-                connectionString:config.GetConnectionString("BackConn"), 
-                ServerVersion.AutoDetect(config.GetConnectionString("BackConn")),
+                connectionString:config.GetConnectionString("CarRentalConnectionMySQL"), 
+                ServerVersion.AutoDetect(config.GetConnectionString("CarRentalConnectionMySQL")),
                 mysqloptions =>
                     mysqloptions.EnableRetryOnFailure()));
         }
         else{
             services.AddDbContext<TContext>(option => option.UseSqlServer(
-            config.GetConnectionString("MysqlConnection"), 
+            config.GetConnectionString("CarRentalConnectionTSQL"), 
             sqlserveroptions =>
                 sqlserveroptions.EnableRetryOnFailure()));
         }
@@ -48,6 +48,7 @@ public static class SharedServiceContainer
         app.UseMiddleware<GlobalException>();
 
         //register middleware to block all outsider API calls
+        // KW: DEBUG to comment out following line
         //app.UseMiddleware<ListenToOnlyApiGateway>();
 
         return app;
