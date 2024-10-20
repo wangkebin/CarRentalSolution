@@ -15,7 +15,7 @@ public class CustomerRepository(CustomerDbContext context) : ICustomer
         try
         {
             var getCustomer = (await GetByAsync(c => c.Email == entity.Email)).FirstOrDefault();
-            if (!string.IsNullOrEmpty(getCustomer!.Email))
+            if (getCustomer is not null && !string.IsNullOrEmpty(getCustomer!.Email))
             {
                 return new Response(false, "Email already exists");
             }
