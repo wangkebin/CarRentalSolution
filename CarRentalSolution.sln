@@ -3,19 +3,23 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarRental.Domain", "CarRental.Domain\CarRental.Domain.csproj", "{0CC2B717-C43C-4055-8045-18EBB3EC57C7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CarRental.Domain", "CarRental.Domain\CarRental.Domain.csproj", "{0CC2B717-C43C-4055-8045-18EBB3EC57C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarRental.SharedLibrary", "CarRental.SharedLibrary\CarRental.SharedLibrary.csproj", "{42A06866-DE03-4182-947F-5D190D909AAE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CarRental.SharedLibrary", "CarRental.SharedLibrary\CarRental.SharedLibrary.csproj", "{42A06866-DE03-4182-947F-5D190D909AAE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarRental.Application", "CarRental.Application\CarRental.Application.csproj", "{BE028087-5CDF-48B2-AD6A-F085E342367E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CarRental.Application", "CarRental.Application\CarRental.Application.csproj", "{BE028087-5CDF-48B2-AD6A-F085E342367E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarRental.Infrastructure", "CarRental.Infrastructure\CarRental.Infrastructure.csproj", "{8FAFEE2A-6656-4A1D-A354-FAFDDDFB90C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CarRental.Infrastructure", "CarRental.Infrastructure\CarRental.Infrastructure.csproj", "{8FAFEE2A-6656-4A1D-A354-FAFDDDFB90C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarRental.Presentation", "CarRental.Presentation\CarRental.Presentation.csproj", "{26BFE0D1-B323-472F-83F6-30D11A6D47C1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CarRental.Presentation", "CarRental.Presentation\CarRental.Presentation.csproj", "{26BFE0D1-B323-472F-83F6-30D11A6D47C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarRental.Application.UnitTest", "CarRental.Application.UnitTest\CarRental.Application.UnitTest.csproj", "{3D370F57-29B2-4097-9BB7-356D2E5EA46B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CarRental.Application.UnitTest", "CarRental.Application.UnitTest\CarRental.Application.UnitTest.csproj", "{3D370F57-29B2-4097-9BB7-356D2E5EA46B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarRental.Infrastructure.UnitTest", "CarRental.Infrastructure.UnitTest\CarRental.Infrastructure.UnitTest.csproj", "{9D46D226-90E6-4C41-A5EB-5CF8C11F4129}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CarRental.Infrastructure.UnitTest", "CarRental.Infrastructure.UnitTest\CarRental.Infrastructure.UnitTest.csproj", "{9D46D226-90E6-4C41-A5EB-5CF8C11F4129}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorApp2", "BlazorApp2\BlazorApp2\BlazorApp2.csproj", "{84294197-C6F1-4C6F-8A56-3498BBB99D65}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorApp2.Client", "BlazorApp2\BlazorApp2.Client\BlazorApp2.Client.csproj", "{246CDE45-B4CE-4087-9C39-5C4F2F628978}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +55,14 @@ Global
 		{9D46D226-90E6-4C41-A5EB-5CF8C11F4129}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9D46D226-90E6-4C41-A5EB-5CF8C11F4129}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9D46D226-90E6-4C41-A5EB-5CF8C11F4129}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84294197-C6F1-4C6F-8A56-3498BBB99D65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84294197-C6F1-4C6F-8A56-3498BBB99D65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84294197-C6F1-4C6F-8A56-3498BBB99D65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84294197-C6F1-4C6F-8A56-3498BBB99D65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{246CDE45-B4CE-4087-9C39-5C4F2F628978}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{246CDE45-B4CE-4087-9C39-5C4F2F628978}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{246CDE45-B4CE-4087-9C39-5C4F2F628978}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{246CDE45-B4CE-4087-9C39-5C4F2F628978}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
