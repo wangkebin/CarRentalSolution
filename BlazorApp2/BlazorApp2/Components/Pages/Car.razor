@@ -1,16 +1,61 @@
-@page "/Car"
-@attribute [StreamRendering]
+@page "/cars"
+@using CarRental.Application.DTOs
+@using System.Net.Http.Json
+@inject HttpClient HttpClient
 
-<h3>Car</h3>
+<h3>Cars</h3>
+
+@if (cars == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Brand</th>
+                <th>Model</th>
+                <th>Year</th>
+                <th>License Plate</th>
+                <th>Category</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var car in cars)
+            {
+                <tr>
+                    <td>@car.Id</td>
+                    <td>@car.Brand</td>
+                    <td>@car.Model</td>
+                    <td>@car.Year</td>
+                    <td>@car.LicensePlate</td>
+                    <td>@car.Category</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 
 @code {
+    private IEnumerable<CarDTO> cars;
 
     protected override async Task OnInitializedAsync()
     {
-        // Simulate asynchronous loading to demonstrate streaming rendering
-        await Task.Delay(500);
+        await LoadCars();
+    }
 
-        var startDate = DateOnly.FromDateTime(DateTime.Now);
-        
+    private async Task LoadCars()
+    {
+        try
+        {
+            cars = await HttpClient.GetFromJsonAsync<IEnumerable<CarDTO>>("http://localhost:5001/api/Car");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading cars: {ex.Message}");
+            // You might want to show an error message to the user here
+        }
     }
 }
