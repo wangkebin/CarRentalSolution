@@ -7,7 +7,9 @@ using CarRental.Domain.Entities;
 using CarRental.Infrastructure.Data;
 using CarRental.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Moq;
+using Moq.EntityFrameworkCore;
 using Xunit;
 
 namespace CarRental.Infrastructure.UnitTest.Repositories
@@ -20,18 +22,35 @@ namespace CarRental.Infrastructure.UnitTest.Repositories
 
         public CarRepositoryTest()
         {
-            _mockContext = new Mock<CarDbContext>();
             _mockSet = new Mock<DbSet<Car>>();
-            _mockContext.Setup(c => c.Cars).Returns(_mockSet.Object);
+            _mockContext = new Mock<CarDbContext>();
+            _mockContext.Setup(m => m.Cars).Returns(_mockSet.Object);
             _repository = new CarRepository(_mockContext.Object);
         }
 
+        private static List<Car> GetFakeCars()
+        {
+            return new List<Car>()
+            {
+                new Car { Id = 1, Brand = "Toyota", Model = "Corolla", LicensePlate = "ABC123" },
+                new Car { Id = 2, Brand = "Honda", Model = "Civic", LicensePlate = "HON123" }
+            };
+        }
+        
         [Fact]
         public async Task CreateAsync_ShouldReturnSuccessResponse_WhenCarIsCreated()
         {
             // Arrange
             var car = new Car { Id = 1, Brand = "Toyota", Model = "Corolla", LicensePlate = "ABC123" };
-            _mockSet.Setup(_ => _.AddAsync(It.IsAny<Car>(), default)).ReturnsAsync(car);
+            var mockEntityEntry = new Mock<EntityEntry<Car>>();
+            mockEntityEntry.Setup(e => e.Entity).Returns(car);
+            
+            var employeeContextMock = new Mock<CarDbContext>();
+            employeeContextMock.Setup<DbSet<Car>>(x => x.Cars)
+                .ReturnsDbSet(GetFakeCars());
+            
+            _mockSet.Setup(m => m.AddAsync(It.IsAny<Car>(), default))
+                .ReturnsAsync(mockEntityEntry.Object);
             _mockContext.Setup(m => m.SaveChangesAsync(default)).ReturnsAsync(1);
 
             // Act
