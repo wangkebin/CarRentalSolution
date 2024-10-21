@@ -10,8 +10,8 @@
 <div class="d-flex justify-content-between mb-3">
     <button class="btn btn-danger" @onclick="CancelReservation" disabled="@(selectedReservation == null)">Cancel Reservation</button>
     <div>
-        <input type="datetime-local" @bind="startDate" />
-        <input type="datetime-local" @bind="endDate" />
+        <input type="datetime-local" @bind="startDate" @onchange="OnStartDateChanged" min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+        <input type="datetime-local" @bind="endDate" @onchange="OnEndDateChanged" min="@startDate.ToString("yyyy-MM-ddTHH:mm")" />
         <button class="btn btn-primary" @onclick="CreateReservation">Create Reservation</button>
     </div>
 </div>
@@ -83,6 +83,36 @@ else
     {
         selectedReservation = selectedReservation == reservation ? null : reservation;
     }
+
+    private void OnStartDateChanged(ChangeEventArgs e)
+    {
+        if (DateTime.TryParse(e.Value.ToString(), out DateTime newStartDate))
+        {
+            startDate = newStartDate;
+            if (endDate <= startDate)
+            {
+                endDate = startDate.AddDays(1);
+            }
+        }
+    }
+
+    private void OnEndDateChanged(ChangeEventArgs e)
+    {
+        if (DateTime.TryParse(e.Value.ToString(), out DateTime newEndDate))
+        {
+            endDate = newEndDate;
+            if (endDate <= startDate)
+            {
+                DateTime newStartDate = endDate.AddDays(-1);
+                if (newStartDate < DateTime.Now)
+                {
+                    newStartDate = DateTime.Now;
+                }
+                startDate = newStartDate;
+            }
+        }
+    }
+
 
     private async Task CancelReservation()
     {
