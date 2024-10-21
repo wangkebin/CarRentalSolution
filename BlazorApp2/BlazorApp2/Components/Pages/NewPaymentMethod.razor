@@ -1,0 +1,110 @@
+@page "/new-paymentmethod"
+@using BlazorApp2.Services
+@using CarRental.Application.DTOs
+@using CarRental.Application.DTOs.Conversions
+@using CarRental.Application.Services
+@using CarRental.Domain.Entities
+@inject HttpClient HttpClient
+@inject IHttpClientFactory ClientFactory
+@inject UserState UserState
+@inject NavigationManager NavigationManager
+
+<h3>New Payment Method</h3>
+
+<EditForm Model="@paymentMethod" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="firstName">First Name:</label>
+                <InputText id="firstName" @bind-Value="paymentMethod.FirstName" class="form-control" />
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="lastName">Last Name:</label>
+                <InputText id="lastName" @bind-Value="paymentMethod.LastName" class="form-control" />
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="cardNumber">Card Number:</label>
+                <InputText id="cardNumber" @bind-Value="paymentMethod.CardNumber" class="form-control" />
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="cardAddress">Card Address:</label>
+                <InputText id="cardAddress" @bind-Value="paymentMethod.CardAddress" class="form-control" />
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3" @onclick="CreatePaymentMethod">Add Payment Method</button>
+</EditForm>
+
+@if (createdPaymentMethod != null)
+{
+    <div class="mt-3">
+        <h4>Created Payment Method:</h4>
+        <p>ID: @createdPaymentMethod.Id</p>
+        <p>Name: @createdPaymentMethod.FirstName @createdPaymentMethod.LastName</p>
+        <p>Card Number: @createdPaymentMethod.CardNumber</p>
+        <p>Card Address: @createdPaymentMethod.CardAddress</p>
+    </div>
+}
+
+@code {
+
+    private PaymentMethodModel paymentMethod = new PaymentMethodModel();
+    private PaymentMethodDTO? createdPaymentMethod;
+
+    private async Task HandleValidSubmit()
+    {
+        
+    }
+
+    private async Task CreatePaymentMethod()
+    {
+        try
+        {
+            var newPaymentMethod = new PaymentMethodDTO(
+                Id: 0,
+                FirstName: paymentMethod.FirstName,
+                LastName: paymentMethod.LastName,
+                CardNumber: paymentMethod.CardNumber,
+                CardAddress: paymentMethod.CardAddress,
+                CustomerId: UserState.CustomerId
+                );
+            var client = ClientFactory.CreateClient();
+            var response = await client.PostAsJsonAsync("http://localhost:5001/api/PaymentMethod", newPaymentMethod);
+            if (!response.IsSuccessStatusCode)
+            {
+                // Handle error
+                Console.WriteLine("Failed to create payment method");
+            }
+
+            NavigationManager.NavigateTo($"/PaymentMethod");
+            
+
+        }
+        catch(Exception ex)
+        {
+            Console.WriteLine($"Error creating payment method: {ex.Message}");
+        }
+    }
+    private class PaymentMethodModel
+    {
+        public int Id { get; set; }
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string CardNumber { get; set; } = string.Empty;
+        public string CardAddress { get; set; } = string.Empty;
+        public int CustomerId { get; set; }
+    }
+}

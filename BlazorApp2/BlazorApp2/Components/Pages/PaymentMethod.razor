@@ -1,0 +1,123 @@
+@page "/paymentmethod"
+@using System.Reflection.Metadata
+@using BlazorApp2.Services
+@using CarRental.Application.DTOs
+@using CarRental.Application.Services
+@using CarRental.Domain.Entities
+@inject HttpClient HttpClient
+@inject IHttpClientFactory ClientFactory
+@inject UserState UserState
+@inject NavigationManager NavigationManager
+
+<h3>Payment Method</h3>
+
+<div class="d-flex justify-content-between mb-3">
+    <button class="btn btn-danger" @onclick="CancelPaymentMethod" disabled="@(selectedPaymentMethod == null)">Cancel
+        Payment Method
+    </button>
+    <div>
+        <button class="btn btn-primary" @onclick="CreatePaymentMethod">Create Payment Method</button>
+    </div>
+</div>
+
+@if (paymentMethods == null)
+{
+<p><em>Loading...</em></p>
+}
+else
+{
+<table class="table table-hover">
+    <thead>
+    <tr>
+        <th>Select</th>
+        <th>ID</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Card Number</th>
+        <th>Card Address</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var paymentMethod in paymentMethods)
+    {
+    <tr class="@(selectedPaymentMethod == paymentMethod ? "table-primary" : "")"
+        @onclick="() => SelectPaymentMethod(paymentMethod)">
+        <td>
+            <input type="radio" name="selectedPaymentMethod"
+                   value="@paymentMethod.Id"
+                   checked="@(selectedPaymentMethod?.Id == paymentMethod.Id)"
+                   @onchange="@(() => SelectPaymentMethod(paymentMethod))"/>
+        </td>
+        <td>@paymentMethod.Id</td>
+        <td>@paymentMethod.FirstName</td>
+        <td>@paymentMethod.LastName</td>
+        <td>@paymentMethod.CardNumber</td>
+        <td>@paymentMethod.CardAddress</td>
+    </tr>
+    }
+    </tbody>
+</table>
+}
+
+@code {
+
+    private IEnumerable<PaymentMethodDTO> paymentMethods;
+    private PaymentMethodDTO selectedPaymentMethod;
+    private PaymentMethodDTO paymentMethod;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadPaymentMethod();
+    }
+    
+    private async Task LoadPaymentMethod()
+    {
+        try
+        {
+            var client = ClientFactory.CreateClient();
+            paymentMethods = await client.GetFromJsonAsync<IEnumerable<PaymentMethodDTO>>("http://localhost:5001/api/paymentmethod");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading payment mothods: {ex.Message}");
+        }
+    }
+    
+    
+
+    private void CreatePaymentMethod()
+    {
+        NavigationManager.NavigateTo($"/new-paymentmethod");
+    }
+
+    private void SelectPaymentMethod(PaymentMethodDTO paymentMethod)
+    {
+        selectedPaymentMethod = selectedPaymentMethod == paymentMethod ? null : paymentMethod;
+    }
+
+    private async Task CancelPaymentMethod()
+    {
+        if (selectedPaymentMethod != null)
+        {
+            try
+            {
+                var client = ClientFactory.CreateClient();
+                var response = await client.DeleteAsync($"http://localhost:5001/api/paymentmethod/{selectedPaymentMethod.Id}");
+                if (response.IsSuccessStatusCode)
+                {
+                    await LoadPaymentMethod();
+                    selectedPaymentMethod = null;
+                }
+                else
+                {
+                    // Handle error
+                    Console.WriteLine("Failed to cancel payment methods");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error cancelling payment mothod: {ex.Message}");
+            }
+        }
+    }
+}

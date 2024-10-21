@@ -17,6 +17,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="paymentMethod">Payment Method:</label>
+                <button class="btn btn-primary" @onclick="CreatePaymentMethod">New Payment Method</button>
                 <InputSelect id="paymentMethod" @bind-Value="reservation.PaymentMethodId" class="form-control">
                     <option value="">-- Select Payment Method --</option>
                     @foreach (var method in paymentMethods)
@@ -142,7 +143,7 @@
     protected override async Task OnInitializedAsync()
     {
         // TODO: Replace with actual customer ID
-        int customerId = 1;
+        int customerId = UserState.CustomerId;
         paymentMethods = (await HttpClient.GetFromJsonAsync<IEnumerable<PaymentMethodDTO>>($"http://localhost:5001/api/PaymentMethod/Customer/{customerId}")).ToList(); 
         await ReloadCars();
     }
@@ -211,6 +212,10 @@
         }
     }
 
+    private void CreatePaymentMethod()
+    {
+        NavigationManager.NavigateTo($"/new-paymentmethod");
+    }
     private class ReservationModel
     {
         public int CarId { get; set; }
