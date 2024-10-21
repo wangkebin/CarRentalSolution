@@ -1,4 +1,6 @@
 ﻿@inherits LayoutComponentBase
+@using BlazorApp2.Services
+@inject UserState UserState
 
 <div class="page">
     <div class="sidebar">
@@ -7,7 +9,8 @@
 
     <main>
         <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+            Welcom to car reservation system
+            @* Welcom to car reservation system -- @UserState.Username *@
         </div>
 
         <article class="content px-4">

@@ -1,7 +1,37 @@
 ﻿@page "/"
+@using BlazorApp2.Services
+@inject NavigationManager NavigationManager
+@inject UserState UserState
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>Please sign in to continue</h1>
+<div class="form-group">
+    <label for="username">Username:</label>
+    <input type="text" id="username" class="form-control" @bind="username" />
+    <label for="password">Password:</label>
+    <input type="password" id="password" class="form-control" @bind="password" />
+    <button class="btn btn-primary mt-2" @onclick="HandleSubmit">Submit</button>
 
-Welcome to your new app.
+</div>
+<p>Debug: Username is @username</p>
+<p>Debug: UserState.Username is @UserState.Username</p>
+
+
+@code {
+    private string username = "";
+    private string password = "";
+    private void HandleSubmit()
+    {
+        Console.WriteLine($"HandleSubmit called. Username: {username}");
+        UserState.Username = username;
+        
+        Console.WriteLine($"UserState.Username set to: {UserState.Username}");
+ 
+        // Here you would typically validate the username and password
+        // For this example, we'll just navigate to the Car component
+        NavigationManager.NavigateTo($"http://localhost:5001/api/Car");
+    }
+}
+
+
