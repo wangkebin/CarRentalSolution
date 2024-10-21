@@ -7,9 +7,7 @@ using Polly.Registry;
 namespace CarRental.Application.Services;
 
 public class ReservationService(
-    IReservation reservationInterface,
-    HttpClient httpClient,
-    ResiliencePipelineProvider<string> resiliencePipeline) : IReservationService
+    IReservation reservationInterface) : IReservationService
 {
     public async Task<IEnumerable<ReservationDTO>> GetReservationsByCustomerIdAsync(int customerId)
     {

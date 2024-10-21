@@ -1,0 +1,15 @@
+ [INF] Unable to resolve service for type 'CarRental.Application.Services.IPaymentMethodService' while attempting to activate 'CarRental.Presentation.Controllers.PaymentMethodController'.
+ [WRN] Unable to resolve service for type 'CarRental.Application.Services.IPaymentMethodService' while attempting to activate 'CarRental.Presentation.Controllers.PaymentMethodController'.
+ [ERR] Unable to resolve service for type 'CarRental.Application.Services.IPaymentMethodService' while attempting to activate 'CarRental.Presentation.Controllers.PaymentMethodController'.
+ [INF] Unable to resolve service for type 'CarRental.Application.Services.IPaymentMethodService' while attempting to activate 'CarRental.Presentation.Controllers.PaymentMethodController'.
+ [WRN] Unable to resolve service for type 'CarRental.Application.Services.IPaymentMethodService' while attempting to activate 'CarRental.Presentation.Controllers.PaymentMethodController'.
+ [ERR] Unable to resolve service for type 'CarRental.Application.Services.IPaymentMethodService' while attempting to activate 'CarRental.Presentation.Controllers.PaymentMethodController'.
+ [INF] Object reference not set to an instance of an object.
+ [WRN] Object reference not set to an instance of an object.
+ [ERR] Object reference not set to an instance of an object.
+ [INF] Object reference not set to an instance of an object.
+ [WRN] Object reference not set to an instance of an object.
+ [ERR] Object reference not set to an instance of an object.
+ [INF] Value cannot be null. (Parameter 'source')
+ [WRN] Value cannot be null. (Parameter 'source')
+ [ERR] Value cannot be null. (Parameter 'source')

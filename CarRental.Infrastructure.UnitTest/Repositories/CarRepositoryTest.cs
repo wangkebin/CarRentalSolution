@@ -8,6 +8,7 @@ using CarRental.Infrastructure.Data;
 using CarRental.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using MockQueryable.Moq;
 using Moq;
 using Moq.EntityFrameworkCore;
 using Xunit;
@@ -16,15 +17,18 @@ namespace CarRental.Infrastructure.UnitTest.Repositories
 {
     public class CarRepositoryTest
     {
-        private readonly Mock<CarDbContext> _mockContext;
         private readonly Mock<DbSet<Car>> _mockSet;
+        private readonly Mock<CarDbContext> _mockContext;
         private readonly CarRepository _repository;
+        private readonly List<Car> _fakeCars;   
 
         public CarRepositoryTest()
         {
-            _mockSet = new Mock<DbSet<Car>>();
+            
+            _fakeCars = GetFakeCars();
+            _mockSet = _fakeCars.AsQueryable().BuildMockDbSet();
             _mockContext = new Mock<CarDbContext>();
-            _mockContext.Setup(m => m.Cars).Returns(_mockSet.Object);
+            _mockContext.Setup(c => c.Cars).Returns(_mockSet.Object);
             _repository = new CarRepository(_mockContext.Object);
         }
 
@@ -41,17 +45,7 @@ namespace CarRental.Infrastructure.UnitTest.Repositories
         public async Task CreateAsync_ShouldReturnSuccessResponse_WhenCarIsCreated()
         {
             // Arrange
-            var car = new Car { Id = 1, Brand = "Toyota", Model = "Corolla", LicensePlate = "ABC123" };
-            var mockEntityEntry = new Mock<EntityEntry<Car>>();
-            mockEntityEntry.Setup(e => e.Entity).Returns(car);
-            
-            var employeeContextMock = new Mock<CarDbContext>();
-            employeeContextMock.Setup<DbSet<Car>>(x => x.Cars)
-                .ReturnsDbSet(GetFakeCars());
-            
-            _mockSet.Setup(m => m.AddAsync(It.IsAny<Car>(), default))
-                .ReturnsAsync(mockEntityEntry.Object);
-            _mockContext.Setup(m => m.SaveChangesAsync(default)).ReturnsAsync(1);
+            var car = new Car { Id = 3, Brand = "Toyota", Model = "Corolla", LicensePlate = "CREATE" };
 
             // Act
             var result = await _repository.CreateAsync(car);
@@ -97,16 +91,16 @@ namespace CarRental.Infrastructure.UnitTest.Repositories
         public async Task GetAllAsync_ShouldReturnAllCars()
         {
             // Arrange
-            var cars = new List<Car>
-            {
-                new Car { Id = 1, Brand = "Toyota", Model = "Corolla", LicensePlate = "ABC123" },
-                new Car { Id = 2, Brand = "Honda", Model = "Civic", LicensePlate = "XYZ789" }
-            }.AsQueryable();
-
-            _mockSet.As<IQueryable<Car>>().Setup(m => m.Provider).Returns(cars.Provider);
-            _mockSet.As<IQueryable<Car>>().Setup(m => m.Expression).Returns(cars.Expression);
-            _mockSet.As<IQueryable<Car>>().Setup(m => m.ElementType).Returns(cars.ElementType);
-            _mockSet.As<IQueryable<Car>>().Setup(m => m.GetEnumerator()).Returns(cars.GetEnumerator());
+            // var cars = new List<Car>
+            // {
+            //     new Car { Id = 1, Brand = "Toyota", Model = "Corolla", LicensePlate = "ABC123" },
+            //     new Car { Id = 2, Brand = "Honda", Model = "Civic", LicensePlate = "XYZ789" }
+            // }.AsQueryable();
+            //
+            // _mockSet.As<IQueryable<Car>>().Setup(m => m.Provider).Returns(cars.Provider);
+            // _mockSet.As<IQueryable<Car>>().Setup(m => m.Expression).Returns(cars.Expression);
+            // _mockSet.As<IQueryable<Car>>().Setup(m => m.ElementType).Returns(cars.ElementType);
+            // _mockSet.As<IQueryable<Car>>().Setup(m => m.GetEnumerator()).Returns(cars.GetEnumerator());
 
             // Act
             var result = await _repository.GetAllAsync();
@@ -119,8 +113,9 @@ namespace CarRental.Infrastructure.UnitTest.Repositories
         public async Task GetByIdAsync_ShouldReturnCar_WhenCarExists()
         {
             // Arrange
-            var car = new Car { Id = 1, Brand = "Toyota", Model = "Corolla", LicensePlate = "ABC123" };
-            _mockSet.Setup(m => m.FindAsync(car.Id)).ReturnsAsync(car);
+            //var car = new Car { Id = 1, Brand = "Toyota", Model = "Corolla", LicensePlate = "ABC123" };
+           var car = _fakeCars.First();
+           // _mockSet.Setup(m => m.FindAsync(car.Id)).ReturnsAsync(car);
 
             // Act
             var result = await _repository.GetByIdAsync(car.Id);
@@ -151,6 +146,53 @@ namespace CarRental.Infrastructure.UnitTest.Repositories
             // Assert
             Assert.NotNull(result);
             Assert.Equal("Toyota", result.FirstOrDefault()!.Brand);
+        }
+    }
+
+    public class AddHelper : IAddHelper
+    {
+
+        public void AddEntity<TEntity>(DbContext db, TEntity entities) where TEntity : class
+        {
+            db.Set<TEntity>().Add(entities);
+        }
+    }
+
+    public interface IAddHelper
+    {
+        void AddEntity<TEntity>(DbContext db, TEntity entities) where TEntity : class;
+    }
+    public class DbContextMock
+    {
+        public static TContext GetMock<TData, TContext>(List<TData> lstData,
+            Expression<Func<TContext, DbSet<TData>>> dbSetSelectionExpression)
+            where TData : Record where TContext : DbContext
+        {
+            IQueryable<TData> lstDataQueryable = lstData.AsQueryable();
+            Mock<DbSet<TData>> dbSetMock = new Mock<DbSet<TData>>();
+            Mock<TContext> dbContext = new Mock<TContext>();
+
+            dbSetMock.As<IQueryable<TData>>().Setup(s => s.Provider).Returns(lstDataQueryable.Provider);
+            dbSetMock.As<IQueryable<TData>>().Setup(s => s.Expression).Returns(lstDataQueryable.Expression);
+            dbSetMock.As<IQueryable<TData>>().Setup(s => s.ElementType).Returns(lstDataQueryable.ElementType);
+            dbSetMock.As<IQueryable<TData>>().Setup(s => s.GetEnumerator())
+                .Returns(() => lstDataQueryable.GetEnumerator());
+            dbSetMock.Setup(x => x.Add(It.IsAny<TData>())).Callback<TData>(lstData.Add);
+            dbSetMock.Setup(x => x.AddRange(It.IsAny<IEnumerable<TData>>()))
+                .Callback<IEnumerable<TData>>(lstData.AddRange);
+            dbSetMock.Setup(x => x.Remove(It.IsAny<TData>())).Callback<TData>(t => lstData.Remove(t));
+            dbSetMock.Setup(x => x.RemoveRange(It.IsAny<IEnumerable<TData>>())).Callback<IEnumerable<TData>>(ts =>
+            {
+                foreach (var t in ts)
+                {
+                    lstData.Remove(t);
+                }
+            });
+
+
+            dbContext.Setup(dbSetSelectionExpression).Returns(dbSetMock.Object);
+
+            return dbContext.Object;
         }
     }
 }

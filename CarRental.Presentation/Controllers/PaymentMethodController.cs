@@ -1,6 +1,7 @@
 using CarRental.Application.DTOs;
 using CarRental.Application.DTOs.Conversions;
 using CarRental.Application.Interfaces;
+using CarRental.Application.Services;
 using CarRental.Domain.Entities;
 using CarRental.SharedLibrary.Response;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +10,7 @@ namespace CarRental.Presentation.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class PaymentMethodController(IPaymentMethod paymentMethodInterface) : Controller
+public class PaymentMethodController(IPaymentMethod paymentMethodInterface, IPaymentMethodService paymentMethodService) : Controller
 {
     [HttpPost]
     public async Task<ActionResult<Response>> CreatePaymentMethod(PaymentMethodDTO paymentMethodDto)
@@ -48,7 +49,15 @@ public class PaymentMethodController(IPaymentMethod paymentMethodInterface) : Co
 
         var paymentMethodDto = paymentMethod.FromPaymentMethod();
         return paymentMethodDto is not null ? Ok(paymentMethodDto) : NotFound($"no payment method found with id: {id}");
-    }   
+    }
+
+    [HttpGet("customer/{customerId}")]
+    public async Task<ActionResult<Response>> GetPaymentMethodByCustomerId(int customerId)
+    {
+        var paymentMethodsDto = await paymentMethodService.GetPaymentMethodsByCustomerIdAsync(customerId);
+
+        return paymentMethodsDto is not null ? Ok(paymentMethodsDto) : NotFound($"no payment method found with customerId: {customerId}");
+    }
 
     [HttpPut]
     public async Task<ActionResult<Response>> UpdatePaymentMethod(PaymentMethodDTO paymentMethodDto)

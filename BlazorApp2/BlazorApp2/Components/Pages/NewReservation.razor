@@ -1,0 +1,103 @@
+@page "/new-reservation"
+@using BlazorApp2.Services
+@using CarRental.Application.DTOs
+@inject HttpClient HttpClient
+
+<h3>New Reservation</h3>
+
+<EditForm Model="@reservation" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="paymentMethod">Payment Method:</label>
+        <InputSelect id="paymentMethod" @bind-Value="reservation.PaymentMethodId" class="form-control">
+            <option value="">-- Select Payment Method --</option>
+            @foreach (var method in paymentMethods)
+            {
+                <option value="@method.CardNumber">@method.CardNumber</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="form-group mt-4">
+        <h4>Available Cars</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>Brand</th>
+                    <th>Model</th>
+                    <th>License Plate</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var car in availableCars)
+                {
+                    <tr>
+                        <td>
+                           <input type="radio" name="selectedCar" value="@car.Id" 
+                                   checked="@(car.Id == reservation.CarId)"
+                                   @onchange="@(() => OnCarSelected(car))" />
+                        </td>
+                        <td>@car.Brand</td>
+                        <td>@car.Model</td>
+                        <td>@car.LicensePlate</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Create Reservation</button>
+</EditForm>
+
+@code {
+    private ReservationModel reservation = new ReservationModel();
+    private DateTime startDate;
+    private DateTime endDate;
+
+    private List<ReservationDTO> reservations = new List<ReservationDTO>();
+    private List<PaymentMethodDTO> paymentMethods = new List<PaymentMethodDTO>();
+    private List<CarDTO> availableCars = new List<CarDTO>();    
+    private List<CarDTO> allCars = new List<CarDTO>();
+    private CarDTO selectedCar = null;  
+
+    protected override async Task OnInitializedAsync()
+    {
+        // TODO: Replace with actual customer ID
+        int customerId = 1;
+        paymentMethods = (await HttpClient.GetFromJsonAsync<IEnumerable<PaymentMethodDTO>>($"http://localhost:5001/api/PaymentMethod/Customer/{customerId}")).ToList(); 
+        await ReloadCars();
+    }
+
+    private void OnCarSelected(CarDTO car)
+    {
+        selectedCar = car;
+        StateHasChanged();
+    }
+
+    private async Task LoadCars()
+    {
+        availableCars = allCars.Where(car => !reservations.Any(r => r.CarId == car.Id && r.ReservationEndDateTime >= DateTime.Today && r.ReservationStartDateTime <= DateTime.Today)).ToList();
+    }
+
+    private async Task ReloadCars()
+    {
+        reservations = (await HttpClient.GetFromJsonAsync<IEnumerable<ReservationDTO>>("http://localhost:5001/api/Reservation")).ToList();
+        allCars = (await HttpClient.GetFromJsonAsync<IEnumerable<CarDTO>>("http://localhost:5001/api/Car")).ToList();
+        await LoadCars();  
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        // TODO: Implement reservation creation logic
+        Console.WriteLine($"Creating reservation for Car ID: {reservation.CarId} with Payment Method ID: {reservation.PaymentMethodId}");
+    }
+
+    private class ReservationModel
+    {
+        public int CarId { get; set; }
+        public int PaymentMethodId { get; set; }
+    }
+}

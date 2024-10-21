@@ -1,6 +1,7 @@
 using CarRental.Application.DTOs;
 using CarRental.Application.DTOs.Conversions;
 using CarRental.Application.Interfaces;
+using CarRental.Application.Services;
 using CarRental.Domain.Entities;
 using CarRental.SharedLibrary.Response;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +10,7 @@ namespace CarRental.Presentation.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class ReservationController(IReservation reservationInterface) : Controller
+public class ReservationController(IReservation reservationInterface, IReservationService reservationService) : Controller
 {
     [HttpPost]
     public async Task<ActionResult<Response>> CreateReservation(ReservationDTO reservationDto)
@@ -48,7 +49,15 @@ public class ReservationController(IReservation reservationInterface) : Controll
 
         var reservationDto = reservation.FromReservation();
         return reservationDto is not null ? Ok(reservationDto) : NotFound($"no reservation found with id: {id}");
-    }   
+    }
+
+    [HttpGet("customer/{customerId}")]
+    public async Task<ActionResult<Response>> GetReservationByCustomerId(int customerId)
+    {
+        var reservationsDto = await reservationService.GetReservationsByCustomerIdAsync(customerId);
+        
+        return reservationsDto!.Any() ? Ok(reservationsDto) : NotFound("no reservations found");
+    }
 
     [HttpPut]
     public async Task<ActionResult<Response>> UpdateReservation(ReservationDTO reservationDto)

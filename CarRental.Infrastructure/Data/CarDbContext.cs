@@ -3,7 +3,11 @@ using CarRental.Domain.Entities;
 
 namespace CarRental.Infrastructure.Data;
 
-public class CarDbContext(DbContextOptions<CarDbContext> options) : DbContext(options)
+public class CarDbContext : DbContext
 {
-    public DbSet<Car> Cars { get; set; }   
+    public CarDbContext(): base(){}
+    public CarDbContext(DbContextOptions<CarDbContext> options) : base(options)
+    {
+    }
+    public virtual DbSet<Car> Cars { get; set; }  
 }

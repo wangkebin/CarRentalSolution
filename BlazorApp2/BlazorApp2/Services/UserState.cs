@@ -2,20 +2,10 @@ namespace BlazorApp2.Services
 {
     public class UserState
     {
-        private string _username;
 
-        public string Username
-        {
-            get => _username;
-            set
-            {
-                _username = value;
-                NotifyStateChanged();
-            }
-        }
+        public string Username{get;set;}
 
-        public event Action OnChange;
+        public int CustomerId { get; set; }
 
-        private void NotifyStateChanged() => OnChange?.Invoke();
     }
 }

@@ -6,8 +6,7 @@ using Polly.Registry;
 
 namespace CarRental.Application.Services;
 
-public class PaymentMethodService(IPaymentMethod paymentMethodInterface, HttpClient httpClient,
-    ResiliencePipelineProvider<string> resiliencePipeline) : IPaymentMethodService
+public class PaymentMethodService(IPaymentMethod paymentMethodInterface) : IPaymentMethodService
 {
     public  async Task<IEnumerable<PaymentMethodDTO>> GetPaymentMethodsByCustomerIdAsync(int customerId)
     {

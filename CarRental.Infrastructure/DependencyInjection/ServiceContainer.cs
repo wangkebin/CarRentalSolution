@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using CarRental.Application.Interfaces;
+using CarRental.Application.Services;
 using CarRental.Infrastructure.Data;
 using CarRental.Infrastructure.Repositories;
 
@@ -26,6 +27,9 @@ public static class ServiceContainer
         services.AddScoped<IPayment, PaymentRepository>();        
         services.AddScoped<IPaymentMethod, PaymentMethodRepository>();
         services.AddScoped<IReservation, ReservationRepository>();
+
+        services.AddScoped<IPaymentMethodService, PaymentMethodService>();
+        services.AddScoped<IReservationService, ReservationService>();
 
         return services;
     }
