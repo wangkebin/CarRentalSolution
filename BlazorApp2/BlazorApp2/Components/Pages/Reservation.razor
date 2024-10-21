@@ -25,6 +25,7 @@ else
     <table class="table table-hover">
         <thead>
             <tr>
+                <th>Select</th>
                 <th>ID</th>
                 @* <th>Car</th> *@
                 <th>Start Date</th>
@@ -36,6 +37,12 @@ else
             @foreach (var reservation in reservations)
             {
                 <tr class="@(selectedReservation == reservation ? "table-primary" : "")" @onclick="() => SelectReservation(reservation)">
+                    <td>
+                        <input type="radio" name="selectedReservation" 
+                               value="@reservation.Id" 
+                               checked="@(selectedReservation?.Id == reservation.Id)"
+                               @onchange="@(() => SelectReservation(reservation))" />
+                    </td>
                     <td>@reservation.Id</td>
                     @* <td>@reservation.Car.Brand @reservation.Car.Model</td> *@
                     <td>@reservation.ReservationStartDateTime.ToString("g")</td>
