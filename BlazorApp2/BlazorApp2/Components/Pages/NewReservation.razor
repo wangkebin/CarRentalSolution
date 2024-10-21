@@ -2,6 +2,9 @@
 @using BlazorApp2.Services
 @using CarRental.Application.DTOs
 @inject HttpClient HttpClient
+@inject IHttpClientFactory ClientFactory
+@inject UserState UserState
+@inject NavigationManager NavigationManager
 
 <h3>New Reservation</h3>
 
@@ -15,7 +18,7 @@
             <option value="">-- Select Payment Method --</option>
             @foreach (var method in paymentMethods)
             {
-                <option value="@method.CardNumber">@method.CardNumber</option>
+                <option value="@method.Id">@method.Id</option>
             }
         </InputSelect>
     </div>
@@ -49,13 +52,42 @@
         </table>
     </div>
 
-    <button type="submit" class="btn btn-primary mt-3">Create Reservation</button>
+    <input type="datetime-local" @bind="startDate" min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")"/>
+    <input type="datetime-local" @bind="endDate" min="@startDate.ToString("yyyy-MM-ddTHH:mm")"/>
+    <button type="submit" class="btn btn-primary mt-3" @onclick="CreateReservation" disabled="@inValidDates">Create Reservation</button>
 </EditForm>
 
 @code {
     private ReservationModel reservation = new ReservationModel();
-    private DateTime startDate;
-    private DateTime endDate;
+    private bool inValidDates = true;
+    private DateTime _startDate = DateTime.Today;
+
+    private DateTime startDate
+    {
+        get => _startDate;
+        set
+        {
+            _startDate = value;
+            OnDateChanged();
+        }
+    }
+
+    private DateTime _endDate = DateTime.Today;
+
+    private DateTime endDate
+    {
+        get => _endDate;
+        set
+        {
+            _endDate = value;
+            OnDateChanged();
+        }
+    }
+
+    private void OnDateChanged()
+    {
+        inValidDates = _startDate > _endDate.AddDays(-1);
+    }
 
     private List<ReservationDTO> reservations = new List<ReservationDTO>();
     private List<PaymentMethodDTO> paymentMethods = new List<PaymentMethodDTO>();
@@ -93,6 +125,35 @@
     {
         // TODO: Implement reservation creation logic
         Console.WriteLine($"Creating reservation for Car ID: {reservation.CarId} with Payment Method ID: {reservation.PaymentMethodId}");
+    }
+
+    private async Task CreateReservation()
+    {
+        try
+        {
+            var newReservation = new ReservationDTO(
+                Id: Guid.NewGuid(),
+                CarId: selectedCar.Id, // You might want to add a car selection feature
+                CustomerId: UserState.CustomerId, // You might want to get this from UserState or elsewhere
+                ReservationStartDateTime: startDate,
+                ReservationEndDateTime: endDate,
+                Note: "Created from UI" + UserState.CustomerId
+            );
+
+            var client = ClientFactory.CreateClient();
+            var response = await client.PostAsJsonAsync("http://localhost:5001/api/Reservation", newReservation);
+            if (!response.IsSuccessStatusCode)
+            {
+                // Handle error
+                Console.WriteLine("Failed to create reservation");
+            }
+
+            NavigationManager.NavigateTo($"/Reservations");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error creating reservation: {ex.Message}");
+        }
     }
 
     private class ReservationModel

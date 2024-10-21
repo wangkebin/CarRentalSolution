@@ -4,15 +4,14 @@
 @using BlazorApp2.Services
 @inject IHttpClientFactory ClientFactory
 @inject UserState UserState
+@inject NavigationManager NavigationManager
 
 <h3>Reservations for @UserState.Username</h3>
 
 <div class="d-flex justify-content-between mb-3">
     <button class="btn btn-danger" @onclick="CancelReservation" disabled="@(selectedReservation == null)">Cancel Reservation</button>
     <div>
-        <input type="datetime-local" @bind="startDate" min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
-        <input type="datetime-local" @bind="endDate" min="@startDate.ToString("yyyy-MM-ddTHH:mm")" />
-        <button class="btn btn-primary" @onclick="CreateReservation" disabled="@inValidDates">Create Reservation</button>
+        <button class="btn btn-primary" @onclick="CreateReservation">Create Reservation</button>
     </div>
 </div>
 
@@ -57,35 +56,7 @@ else
 @code {
     private IEnumerable<ReservationDTO> reservations;
     private ReservationDTO selectedReservation;
-    private bool inValidDates = true;
-    private DateTime _startDate = DateTime.Today;
-
-    private DateTime startDate
-    {
-        get => _startDate;
-        set
-        {
-            _startDate = value;
-            OnDateChanged();
-        }
-    }
-
-    private DateTime _endDate = DateTime.Today;
-    private DateTime endDate
-    {
-        get =>  _endDate;
-        set
-        {
-            _endDate = value;
-            OnDateChanged();
-        }
-    }
-
-    private void OnDateChanged()
-    {
-        inValidDates = _startDate > _endDate.AddDays(-1);
-    }
-
+    
     protected override async Task OnInitializedAsync()
     {
         await LoadReservations();
@@ -136,35 +107,9 @@ else
         }
     }
 
-    private async Task CreateReservation()
+    private void CreateReservation()
     {
-        try
-        {
-            var newReservation = new ReservationDTO(
-                Id: Guid.NewGuid(),
-                CarId: 1, // You might want to add a car selection feature
-                CustomerId: 1, // You might want to get this from UserState or elsewhere
-                ReservationStartDateTime: startDate,
-                ReservationEndDateTime: endDate,
-                Note: "Created from UI"
-            );
-
-            var client = ClientFactory.CreateClient();
-            var response = await client.PostAsJsonAsync("http://localhost:5001/api/Reservation", newReservation);
-            if (response.IsSuccessStatusCode)
-            {
-                await LoadReservations();
-            }
-            else
-            {
-                // Handle error
-                Console.WriteLine("Failed to create reservation");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error creating reservation: {ex.Message}");
-        }
+        NavigationManager.NavigateTo($"/new-reservation");
     }
 }
 
