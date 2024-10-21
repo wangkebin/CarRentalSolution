@@ -1,6 +1,7 @@
 @page "/new-reservation"
 @using BlazorApp2.Services
 @using CarRental.Application.DTOs
+@using CarRental.Domain.Entities
 @inject HttpClient HttpClient
 @inject IHttpClientFactory ClientFactory
 @inject UserState UserState
@@ -12,15 +13,31 @@
     <DataAnnotationsValidator />
     <ValidationSummary />
 
-    <div class="form-group">
-        <label for="paymentMethod">Payment Method:</label>
-        <InputSelect id="paymentMethod" @bind-Value="reservation.PaymentMethodId" class="form-control">
-            <option value="">-- Select Payment Method --</option>
-            @foreach (var method in paymentMethods)
-            {
-                <option value="@method.Id">@method.Id</option>
-            }
-        </InputSelect>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="paymentMethod">Payment Method:</label>
+                <InputSelect id="paymentMethod" @bind-Value="reservation.PaymentMethodId" class="form-control">
+                    <option value="">-- Select Payment Method --</option>
+                    @foreach (var method in paymentMethods)
+                    {
+                    <option value="@method.Id">@method.Id</option>
+                    }
+                </InputSelect>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="carCategory">Car Category:</label>
+                <InputSelect id="carCategory" @bind-Value="selectedCarCategory" class="form-control">
+                    <option value="">-- Select Car Category --</option>
+                    @foreach (var category in carCategories)
+                    {
+                    <option value="@category">@category</option>
+                    }
+                </InputSelect>
+            </div>
+        </div>
     </div>
 
     <div class="form-group mt-4">
@@ -61,6 +78,8 @@
     private ReservationModel reservation = new ReservationModel();
     private bool inValidDates = true;
     private DateTime _startDate = DateTime.Today;
+    private string _selectedCarCategory = "Sedan";
+    private List<string> carCategories = new List<string> { "Sedan", "SUV", "VAN" };
 
     private DateTime startDate
     {
@@ -84,11 +103,36 @@
         }
     }
 
-    private void OnDateChanged()
+    private string selectedCarCategory
+    {
+        get => _selectedCarCategory;
+        set
+        {
+            _selectedCarCategory = value;
+            OnCarCategoryChanged();
+        }
+    }
+    private async Task OnDateChanged()
     {
         inValidDates = _startDate > _endDate.AddDays(-1);
+        await LoadCars();
+        ResetSelectedCarIfUnavailable();
     }
 
+    private async Task OnCarCategoryChanged()
+    { 
+        await LoadCars();
+        ResetSelectedCarIfUnavailable();
+    }
+
+    private void ResetSelectedCarIfUnavailable()
+    {
+        if (selectedCar != null && !availableCars.Any(c => c.Id == selectedCar.Id))
+        {
+            selectedCar = null;
+            reservation.CarId = 0;
+        }
+    }
     private List<ReservationDTO> reservations = new List<ReservationDTO>();
     private List<PaymentMethodDTO> paymentMethods = new List<PaymentMethodDTO>();
     private List<CarDTO> availableCars = new List<CarDTO>();    
@@ -105,13 +149,24 @@
 
     private void OnCarSelected(CarDTO car)
     {
-        selectedCar = car;
+        selectedCar = car; 
         StateHasChanged();
     }
-
+    
     private async Task LoadCars()
     {
-        availableCars = allCars.Where(car => !reservations.Any(r => r.CarId == car.Id && r.ReservationEndDateTime >= DateTime.Today && r.ReservationStartDateTime <= DateTime.Today)).ToList();
+        CarCategory carCategory = _selectedCarCategory switch
+        {
+            "Sedan" => CarCategory.Sedan,
+            "SUV" => CarCategory.SUV,
+            "VAN" => CarCategory.Van,
+                _ => CarCategory.Undefined
+        };
+        availableCars = allCars.Where(car => !reservations.Any(r => r.CarId == car.Id 
+                                                                    && r.ReservationEndDateTime >= startDate 
+                                                                    && r.ReservationStartDateTime <= endDate 
+                                                                    )).ToList();
+        availableCars = availableCars.Where(car => car.Category == carCategory).ToList();
     }
 
     private async Task ReloadCars()
