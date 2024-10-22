@@ -50,6 +50,7 @@
                     <th>Brand</th>
                     <th>Model</th>
                     <th>License Plate</th>
+                    <th>Price</th>
                 </tr>
             </thead>
             <tbody>
@@ -64,6 +65,7 @@
                         <td>@car.Brand</td>
                         <td>@car.Model</td>
                         <td>@car.LicensePlate</td>
+                        <td>@CompPrice(@car.Category)</td>
                     </tr>
                 }
             </tbody>
@@ -134,6 +136,25 @@
             reservation.CarId = 0;
         }
     }
+
+    private int CompPrice(CarCategory category)
+    {
+        switch (category)
+        {
+            case CarCategory.Sedan: 
+                return 25;
+                break;
+            case CarCategory.SUV:
+                return 30;
+                break;
+            case CarCategory.Van:
+                return 35;
+                break;
+            default:
+                return 0;
+            
+        }
+    }
     private List<ReservationDTO> reservations = new List<ReservationDTO>();
     private List<PaymentMethodDTO> paymentMethods = new List<PaymentMethodDTO>();
     private List<CarDTO> availableCars = new List<CarDTO>();    
@@ -202,6 +223,20 @@
             {
                 // Handle error
                 Console.WriteLine("Failed to create reservation");
+            }
+
+            var newPayment = new PaymentDTO(
+                Id: new Guid(),
+                CustomerId: UserState.CustomerId,
+                PaymentMethodId: reservation.PaymentMethodId,
+                AmountCents: (endDate-startDate).Days * CompPrice( selectedCar.Category) * 100,
+                Currency: "USD"
+            );
+            response = await client.PostAsJsonAsync("http://localhost:5001/api/Payment", newPayment);
+            if (!response.IsSuccessStatusCode)
+            {
+                // Handle error
+                Console.WriteLine("Failed to create payment");
             }
 
             NavigationManager.NavigateTo($"/Reservations");
