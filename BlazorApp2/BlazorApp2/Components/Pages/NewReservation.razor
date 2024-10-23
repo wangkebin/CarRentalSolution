@@ -155,10 +155,10 @@
             
         }
     }
-    private List<ReservationDTO> reservations = new List<ReservationDTO>();
-    private List<PaymentMethodDTO> paymentMethods = new List<PaymentMethodDTO>();
-    private List<CarDTO> availableCars = new List<CarDTO>();    
-    private List<CarDTO> allCars = new List<CarDTO>();
+    private IEnumerable<ReservationDTO> reservations = new List<ReservationDTO>();
+    private IEnumerable<PaymentMethodDTO> paymentMethods = new List<PaymentMethodDTO>();
+    private IEnumerable<CarDTO> availableCars = new List<CarDTO>();    
+    private IEnumerable<CarDTO> allCars = new List<CarDTO>();
     private CarDTO selectedCar = null;  
 
     protected override async Task OnInitializedAsync()
@@ -198,8 +198,8 @@
     
         await Task.WhenAll(reservationsTask, carsTask);
 
-        reservations = (await reservationsTask).ToList();
-        allCars = (await carsTask).ToList();
+        reservations = (await reservationsTask)!;
+        allCars = (await carsTask)!;
     
         await LoadCars();  
     }
