@@ -193,8 +193,14 @@
 
     private async Task ReloadCars()
     {
-        reservations = (await HttpClient.GetFromJsonAsync<IEnumerable<ReservationDTO>>("http://localhost:5001/api/Reservation")).ToList();
-        allCars = (await HttpClient.GetFromJsonAsync<IEnumerable<CarDTO>>("http://localhost:5001/api/Car")).ToList();
+        var reservationsTask = HttpClient.GetFromJsonAsync<IEnumerable<ReservationDTO>>("http://localhost:5001/api/Reservation");
+        var carsTask = HttpClient.GetFromJsonAsync<IEnumerable<CarDTO>>("http://localhost:5001/api/Car");
+    
+        await Task.WhenAll(reservationsTask, carsTask);
+
+        reservations = (await reservationsTask).ToList();
+        allCars = (await carsTask).ToList();
+    
         await LoadCars();  
     }
 
